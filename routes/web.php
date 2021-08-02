@@ -2,4 +2,4 @@
 
 use App\Http\Controllers\Admin;
 
-Route::post('/tambahAdmin', Admin@tambahAdmin);
+Route::post('/tambahAdmin', 'Admin@tambahAdmin');
