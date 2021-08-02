@@ -12,9 +12,9 @@ use \Firebase\JWT\JWT;
 class Admin extends Controller
 {
     public function tambahAdmin(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request ->all(), [
             'nama' => 'required',
-            'email' => 'required | unique:tbl_user',
+            'email' => 'required | unique:tbl_admin',
             'password' => 'required',
             'token' => 'required'
         ]);
@@ -66,7 +66,7 @@ class Admin extends Controller
     }
 
     public function loginAdmin(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required'
         ]);
@@ -79,9 +79,9 @@ class Admin extends Controller
         }
 
         $cek = M_Admin::where('email', $request->email)->count();
-        $admin = M_Admin::whare('email', $request->email)->get();
+        $admin = M_Admin::where('email', $request->email)->get();
 
-        if($cek > 1) {
+        if($cek > 0) {
             foreach($admin as $adm) {
                 if($request->password === decrypt($adm->password)) {
                     $key = env('APP_KEY');
@@ -120,7 +120,7 @@ class Admin extends Controller
     }
 
     public function hapusAdmin(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request->all(), [
             'id_admin' => 'required',
             'token' => 'required'
         ]);
@@ -164,7 +164,7 @@ class Admin extends Controller
 
 
     public function listAdmin(Request $request) {
-        $validator = Validator::make($request ->all(), [
+        $validator = Validator::make($request->all(), [
             'token' => 'required'
         ]);
 
