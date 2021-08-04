@@ -1,0 +1,21 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class M_Soal extends Model
+{
+    protected $table = 'tbl_soal';
+    protected $primaryKey = 'id_soal';
+    protected $fillable = [
+        'id_soal',
+        'id_kelas',
+        'pertanyaan',
+        'opsi1',
+        'opsi2',
+        'opsi3',
+        'opsi4',
+        'jawaban'
+    ];
+}
