@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\M_Admin;
 use App\M_Pengajar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -12,9 +13,9 @@ use \Firebase\JWT\JWT;
 class Pengajar extends Controller
 {
     public function tambahPengajar(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request->all(), [
             'nama' => 'required',
-            'email' => 'required | unique:tbl_user',
+            'email' => 'required | unique:tbl_pengajar',
             'password' => 'required',
             'token' => 'required'
         ]);
@@ -66,7 +67,7 @@ class Pengajar extends Controller
     }
 
     public function loginPengajar(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required'
         ]);
@@ -79,20 +80,20 @@ class Pengajar extends Controller
         }
 
         $cek = M_Pengajar::where('email', $request->email)->count();
-        $admin = M_Pengajar::whare('email', $request->email)->get();
+        $pengajar = M_Pengajar::where('email', $request->email)->get();
 
-        if($cek > 1) {
-            foreach($admin as $adm) {
-                if($request->password === decrypt($adm->password)) {
+        if($cek > 0) {
+            foreach($pengajar as $guru) {
+                if($request->password === decrypt($guru->password)) {
                     $key = env('APP_KEY');
                     $data = array(
                         'extime'=>time()+(60*120),
-                        'id_pengajar' => $adm->id_pengajar
+                        'id_pengajar' => $guru->id_pengajar
                     );
 
                     $jwt = JWT::encode($data, $key);
 
-                    M_Pengajar::where('id_pengajar', $adm->id_pengajar)->update(
+                    M_Pengajar::where('id_pengajar', $guru->id_pengajar)->update(
                         [
                             'token' => $jwt
                         ]
@@ -120,7 +121,7 @@ class Pengajar extends Controller
     }
 
     public function hapusPengajar(Request $request) {
-        $validator = Validator::make($request, [
+        $validator = Validator::make($request->all(), [
             'id_pengajar' => 'required',
             'token' => 'required'
         ]);
@@ -162,7 +163,7 @@ class Pengajar extends Controller
 
     }
 
-    public function listAdmin(Request $request) {
+    public function listPengajar(Request $request) {
         $validator = Validator::make($request ->all(), [
             'token' => 'required'
         ]);
@@ -175,10 +176,9 @@ class Pengajar extends Controller
         }
 
         $token = $request->token;
+        $tokenDB = M_Pengajar::where('token', $token)->count();
 
-        $tokenDb = M_Pengajar::where('token', $token)->count();
-
-        if($tokenDb > 0) {
+        if($tokenDB > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
@@ -192,7 +192,60 @@ class Pengajar extends Controller
                     $data[] = array(
                         'nama' => $guru->nama,
                         'email' => $guru->email,
-                        'id_admin' => $guru->id_admin
+                        'id_pengajar' => $guru->id_pengajar
+                    );
+                }
+
+                return response()->json([
+                    'status' => 'berhasil',
+                    'message' => 'Data berhasil diambil',
+                    'data' => $data
+                ]);
+
+            } else {
+                return response()->json([
+                    'status' => 'gagal',
+                    'message' => 'Token Kadaluwarsa'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'Token Tidak Valid'
+            ]);
+        }
+    }
+
+    public function listPengajarAdmin(Request $request) {
+        $validator = Validator::make($request ->all(), [
+            'token' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $validator->messages()
+            ]);
+        }
+
+        $token = $request->token;
+        $tokenDB = M_Admin::where('token', $token)->count();
+
+        if($tokenDB > 0) {
+            $key = env('APP_KEY');
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            $decoded_array =(array) $decoded;
+
+            if($decoded_array['extime'] > time()) {
+                $pengajar = M_Pengajar::get();
+
+                $data = array();
+
+                foreach($pengajar as $guru) {
+                    $data[] = array(
+                        'nama' => $guru->nama,
+                        'email' => $guru->email,
+                        'id_pengajar' => $guru->id_pengajar
                     );
                 }
 

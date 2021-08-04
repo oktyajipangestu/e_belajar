@@ -17,3 +17,9 @@ Route::post('/editMateri', 'Materi@editMateri');
 Route::post('/hapusMateri', 'Materi@hapusMateri');
 Route::post('/listMateriPengajar', 'Materi@listMateriPengajar');
 Route::post('/listMateriPelajar', 'Materi@listMateriPelajar');
+
+Route::post('/tambahKelas', 'Kelas@tambahKelas');
+Route::post('/editKelas', 'Kelas@editKelas');
+Route::post('/hapusKelas', 'Kelas@hapusKelas');
+Route::post('/listKelasPengajar', 'Kelas@listKelasPengajar');
+Route::post('/listKelasPelajar', 'Kelas@listKelasPelajar');

@@ -66,9 +66,9 @@ class Admin extends Controller
     }
 
     public function loginAdmin(Request $request) {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request ->all(), [
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if($validator->fails()) {

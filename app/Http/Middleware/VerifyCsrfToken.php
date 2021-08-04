@@ -31,6 +31,11 @@ class VerifyCsrfToken extends Middleware
         '/editMateri',
         '/hapusMateri',
         '/listMateriPengajar',
-        '/listMateriPelajar'
+        '/listMateriPelajar',
+        '/tambahKelas',
+        '/editKelas',
+        '/hapusKelas',
+        '/listKelasPengajar',
+        '/listKelasPelajar'
     ];
 }

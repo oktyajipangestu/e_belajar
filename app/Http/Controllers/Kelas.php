@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\M_Admin;
-use App\M_Materi;
+use App\M_Kelas;
 use App\M_Pelajar;
 use App\M_Pengajar;
 use Illuminate\Http\Request;
@@ -12,14 +11,13 @@ use Illuminate\Support\Facades\Validator;
 
 use \Firebase\JWT\JWT;
 
-class Materi extends Controller
+class Kelas extends Controller
 {
-    public function tambahMateri(Request $request){
+    public function tambahKelas(Request $request) {
         $validator = Validator::make($request->all(), [
             'judul' => 'required | unique:tbl_materi',
             'keterangan' => 'required',
-            'link_thumbnail' => 'required',
-            'link_video' => 'required'
+            'link_gambar' => 'required',
         ]);
 
         if($validator->fails()) {
@@ -38,12 +36,10 @@ class Materi extends Controller
             $decoded_array = (array) $decoded;
 
             if($decoded_array['extime'] > time()){
-                if(M_Materi::create([
-                    'id_kelas' => $request->id_kelas,
+                if(M_Kelas::create([
                     'judul' => $request->judul,
                     'keterangan' => $request->keterangan,
-                    'link_thumbnail' => $request->link_thumbnail,
-                    'link_video' => $request->link_video
+                    'link_gambar' => $request->link_gambar
                 ])) {
                     return response()->json([
                         'status' => 'berhasil',
@@ -67,16 +63,13 @@ class Materi extends Controller
                 'message' => 'token tidak valid'
             ]);
         }
-
     }
 
-    public function editMateri(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'judul' => 'required | unique:tbl_materi,judul,'.$request->id_materi.',id_materi',
+    public function editKelas(Request $request) {
+        $validator = Validator::make($request ->all(), [
+            'judul' => 'required | unique:tbl_kelas,judul,'.$request->id_kelas.',id_kelas',
             'keterangan' => 'required',
-            'link_thumbnail' => 'required',
-            'link_video' => 'required',
-            'id_materi' => 'required'
+            'link_gambar' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -87,7 +80,7 @@ class Materi extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Materi::where('token', $token)->count();
+        $tokenDB = M_Pengajar::where('token', $token)->count();
 
         if($tokenDB > 0) {
             $key = env('APP_KEY');
@@ -95,11 +88,10 @@ class Materi extends Controller
             $decoded_array = (array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                if(M_Materi::where('id_materi', $request->id_materi)->update([
+                if(M_Kelas::where('id_kelas', $request->id_kelas)->update([
                     'judul' => $request->judul,
                     'keterangan' => $request->keterangan,
-                    'link_thumbnail' => $request->link_thumbnail,
-                    'link_video' => $request->link_video
+                    'link_gambar' => $request->link_gambar
                 ])) {
                     return response()->json([
                         'status' => 'berhasil',
@@ -125,10 +117,9 @@ class Materi extends Controller
         }
     }
 
-
-    public function hapusMateri(Request $request) {
+    public function hapusKelas(Request $request) {
         $validator = Validator::make($request ->all(), [
-            'id_materi' => 'required',
+            'id_konten' => 'required',
             'token' => 'required'
         ]);
 
@@ -140,15 +131,15 @@ class Materi extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Pengajar::where('token', $token)->count();
+        $tokenDb = M_Pengajar::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenDb > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                if(M_Materi::where('id_materi',$request->id_materi)->delete()) {
+                if(M_Kelas::where('id_kelas',$request->id_kelas)->delete()) {
                         return response()->json([
                             'status' => 'berhasil',
                             'message' => 'Data berhasil dihapus'
@@ -174,7 +165,7 @@ class Materi extends Controller
         }
     }
 
-    public function listMateriPengajar(Request $request) {
+    public function listKelasPengajar(Request $request) {
         $validator = Validator::make($request ->all(), [
             'token' => 'required'
         ]);
@@ -187,20 +178,20 @@ class Materi extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Pengajar::where('token', $token)->count();
+        $tokenDb = M_Pengajar::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenDb > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::get();
+                $kelas = M_Kelas::get();
 
                 return response()->json([
                     'status' => 'berhasil',
                     'message' => 'Data berhasil diambil',
-                    'data' => $materi
+                    'data' => $kelas
                 ]);
 
             } else {
@@ -217,7 +208,7 @@ class Materi extends Controller
         }
     }
 
-    public function listMateriPelajar(Request $request) {
+    public function listKelasPelajar(Request $request) {
         $validator = Validator::make($request ->all(), [
             'token' => 'required'
         ]);
@@ -230,20 +221,20 @@ class Materi extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Pelajar::where('token', $token)->count();
+        $tokenDb = M_Pelajar::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenDb > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::get();
+                $kelas = M_Kelas::get();
 
                 return response()->json([
                     'status' => 'berhasil',
                     'message' => 'Data berhasil diambil',
-                    'data' => $materi
+                    'data' => $kelas
                 ]);
 
             } else {
@@ -260,46 +251,4 @@ class Materi extends Controller
         }
     }
 
-    public function listMateriAdmin(Request $request) {
-        $validator = Validator::make($request ->all(), [
-            'token' => 'required'
-        ]);
-
-        if($validator->fails()) {
-            return response()->json([
-                'status' => 'gagal',
-                'message' => $validator->messages()
-            ]);
-        }
-
-        $token = $request->token;
-        $tokenDB = M_Admin::where('token', $token)->count();
-
-        if($tokenDB > 0) {
-            $key = env('APP_KEY');
-            $decoded = JWT::decode($token, $key, array('HS256'));
-            $decoded_array =(array) $decoded;
-
-            if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::get();
-
-                return response()->json([
-                    'status' => 'berhasil',
-                    'message' => 'Data berhasil diambil',
-                    'data' => $materi
-                ]);
-
-            } else {
-                return response()->json([
-                    'status' => 'gagal',
-                    'message' => 'Token Kadaluwarsa'
-                ]);
-            }
-        } else {
-            return response()->json([
-                'status' => 'gagal',
-                'message' => 'Token Tidak Valid'
-            ]);
-        }
-    }
 }

@@ -10,9 +10,10 @@ class M_Materi extends Model
     protected $primary_key = 'id_materi';
     protected $fillable = [
         'id_materi',
+        'id_kelas',
         'judul',
         'keterangan',
-        'link_tumbnail',
+        'link_thumbnail',
         'link_video',
         'status',
         'view'
