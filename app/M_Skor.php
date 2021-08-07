@@ -11,7 +11,7 @@ class M_Skor extends Model
     protected $fillable = [
         'id_skor',
         'id_kelas',
-        'id_peserta',
+        'id_pelajar',
         'skor',
         'status'
     ];

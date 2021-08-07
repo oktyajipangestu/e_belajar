@@ -36,6 +36,19 @@ class VerifyCsrfToken extends Middleware
         '/editKelas',
         '/hapusKelas',
         '/listKelasPengajar',
-        '/listKelasPelajar'
+        '/listKelasPelajar',
+        '/listPelajar',
+        '/registrasiPelajar',
+        '/loginPelajar',
+        '/listMateriPelajar',
+        '/detailMateri',
+        '/listKomentar',
+        '/tambahKomentar',
+        '/onProgress',
+        '/showProgress',
+        '/quiz',
+        '/jawab',
+        '/hitungSkor',
+        '/selesaiUjian'
     ];
 }

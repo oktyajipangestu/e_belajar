@@ -176,7 +176,8 @@ class Materi extends Controller
 
     public function listMateriPengajar(Request $request) {
         $validator = Validator::make($request ->all(), [
-            'token' => 'required'
+            'token' => 'required',
+            'id_kelas' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -195,7 +196,7 @@ class Materi extends Controller
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::get();
+                $materi = M_Materi::where('id_kelas', $request->id)->get();
 
                 return response()->json([
                     'status' => 'berhasil',
@@ -218,8 +219,9 @@ class Materi extends Controller
     }
 
     public function listMateriPelajar(Request $request) {
-        $validator = Validator::make($request ->all(), [
-            'token' => 'required'
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'id_kelas' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -238,7 +240,7 @@ class Materi extends Controller
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::get();
+                $materi = M_Materi::where('id_kelas' , $request->id_kelas)->get();
 
                 return response()->json([
                     'status' => 'berhasil',
@@ -282,6 +284,50 @@ class Materi extends Controller
 
             if($decoded_array['extime'] > time()) {
                 $materi = M_Materi::get();
+
+                return response()->json([
+                    'status' => 'berhasil',
+                    'message' => 'Data berhasil diambil',
+                    'data' => $materi
+                ]);
+
+            } else {
+                return response()->json([
+                    'status' => 'gagal',
+                    'message' => 'Token Kadaluwarsa'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'Token Tidak Valid'
+            ]);
+        }
+    }
+
+    public function detailMateri(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'id_materi' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $validator->messages()
+            ]);
+        }
+
+        $token = $request->token;
+        $tokenDB = M_Pelajar::where('token', $token)->count();
+
+        if($tokenDB > 0) {
+            $key = env('APP_KEY');
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            $decoded_array =(array) $decoded;
+
+            if($decoded_array['extime'] > time()) {
+                $materi = M_Materi::where('id_materi' , $request->id_materi)->get();
 
                 return response()->json([
                     'status' => 'berhasil',

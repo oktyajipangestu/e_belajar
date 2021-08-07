@@ -66,7 +66,7 @@ class Pelajar extends Controller
         }
 
         $cek = M_Pelajar::where('email', $request->email)->count();
-        $pelajar = M_Pelajar::where('eamil', $request->email)->get();
+        $pelajar = M_Pelajar::where('email', $request->email)->get();
 
         if($cek > 0) {
             foreach($pelajar as $siswa) {
@@ -87,7 +87,8 @@ class Pelajar extends Controller
                         return response()->json([
                             'status' => 'berhasil',
                             'message' => 'Berhasil login',
-                            'token' => $jwt
+                            'token' => $jwt,
+                            'data' => $siswa->nama
                         ]);
                     } else {
                         return response()->json([

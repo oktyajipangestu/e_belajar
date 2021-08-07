@@ -29,8 +29,9 @@ class Pengajar extends Controller
 
         $token = $request->token;
         $tokenDB = M_Pengajar::where('token', $token)->count();
+        $tokenAdmin = M_Admin::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenDB > 0 || $tokenAdmin > 0) {
             $key = env('APP_KEY');
 
             $decoded = JWT::decode($token, $key, array('HS256'));
@@ -135,8 +136,9 @@ class Pengajar extends Controller
 
         $token = $request->token;
         $tokenDB = M_Pengajar::where('token', $token)->count();
+        $tokenAdmin = M_Admin::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenDB > 0 || $tokenAdmin > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array = (array) $decoded;
@@ -176,9 +178,10 @@ class Pengajar extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Pengajar::where('token', $token)->count();
+        $tokenAdmin = M_Pengajar::where('token', $token)->count();
+        $tokenPengajar = M_Admin::where('token', $token)->count();
 
-        if($tokenDB > 0) {
+        if($tokenAdmin > 0 || $tokenPengajar > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;

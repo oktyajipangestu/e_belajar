@@ -21,21 +21,22 @@ class Ujian extends Controller
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $cal_skor = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status','1')->count();
+                $cal_skor = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status','1')->count();
                 $id_s = "";
                 if ($cal_skor > 0) {
-                    $id_s = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status', '1')->first();
+                    $id_s = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status', '1')->first();
                 } else {
                     M_Skor::create([
-                        'id_peserta' => $decoded_array['id_peserta']
+                        'id_pelajar' => $decoded_array['id_pelajar'],
+                        'id_kelas' => $request->id_kelas
                     ]);
-                    $id_s = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status', '1')->first();
+                    $id_s = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status', '1')->first();
                 }
 
-                $skor = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status','1')->first();
+                $skor = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status','1')->first();
 
-                $jawaban = M_Jawaban::where('id_peserta', $decoded_array['id_peserta'])->first();
-                $jml_jawaban = M_Jawaban::where('id_peserta', $decoded_array['id_peserta'])->where('id_skor', $skor->id_skor)->count();
+                $jawaban = M_Jawaban::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->first();
+                $jml_jawaban = M_Jawaban::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('id_skor', $skor->id_skor)->count();
 
                 $jumlah_soal = M_Soal::count();
                 $max_rand = $jumlah_soal - 10;
@@ -52,7 +53,7 @@ class Ujian extends Controller
                         'opsi2' => $p->opsi2,
                         'opsi3' => $p->opsi3,
                         'opsi4' => $p->opsi4,
-                        'jumlah_jawaban' => $jml_jawaban
+                        'jumlah_jawaban' => $jml_jawaban,
                     );
                 }
 
@@ -92,7 +93,8 @@ class Ujian extends Controller
                 foreach($soal as $p) {
                     if($request->jawaban == $p->jawaban) {
                         if(M_Jawaban::create([
-                            'id_peserta' => $decoded_array['id_peserta'],
+                            'id_pelajar' => $decoded_array['id_pelajar'],
+                            'id_kelas' => $request->id_kelas,
                             'id_soal' => $p->id_soal,
                             'jawaban'=> $request->jawaban,
                             'id_skor' => $request->id_skor,
@@ -110,7 +112,8 @@ class Ujian extends Controller
                         }
                     } else {
                         if(M_Jawaban::create([
-                            'id_peserta' => $decoded_array['id_peserta'],
+                            'id_pelajar' => $decoded_array['id_pelajar'],
+                            'id_kelas' => $request->id_kelas,
                             'id_soal' => $p->id_soal,
                             'jawaban'=> $request->jawaban,
                             'id_skor' => $request->id_skor,
@@ -144,15 +147,15 @@ class Ujian extends Controller
 
     public function hitungSkor(Request $request) {
         $token = $request->token;
-        $tokenDb = M_Pelajar::where('token', $token)->count();
+        $tokenDB = M_Pelajar::where('token', $token)->count();
 
-        if($tokenDb > 0) {
+        if($tokenDB > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $id_s = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status', '1')->first();
+                $id_s = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status', '1')->first();
                 $jawaban = M_Jawaban::where('status_jawaban', '1')->where('id_skor', $id_s->id_skor)->count();
 
                 return response()->json([

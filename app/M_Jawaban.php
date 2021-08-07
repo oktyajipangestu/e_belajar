@@ -10,8 +10,9 @@ class M_Jawaban extends Model
     protected $primaryKey = 'id_jawaban';
     protected $fillable = [
         'id_jawaban',
+        'id_kelas',
         'id_skor',
-        'id_peserta',
+        'id_pelajar',
         'id_soal',
         'jawaban',
         'status_jawaban'

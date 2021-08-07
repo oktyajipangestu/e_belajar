@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\M_Kelas;
+use App\M_Materi;
 use App\M_Pelajar;
 use App\M_Pengajar;
 use Illuminate\Http\Request;
@@ -119,7 +120,7 @@ class Kelas extends Controller
 
     public function hapusKelas(Request $request) {
         $validator = Validator::make($request ->all(), [
-            'id_konten' => 'required',
+            'id_kelas' => 'required',
             'token' => 'required'
         ]);
 
@@ -224,6 +225,50 @@ class Kelas extends Controller
         $tokenDb = M_Pelajar::where('token', $token)->count();
 
         if($tokenDb > 0) {
+            $key = env('APP_KEY');
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            $decoded_array =(array) $decoded;
+
+            if($decoded_array['extime'] > time()) {
+                $kelas = M_Kelas::get();
+
+                return response()->json([
+                    'status' => 'berhasil',
+                    'message' => 'Data berhasil diambil',
+                    'data' => $kelas
+                ]);
+
+            } else {
+                return response()->json([
+                    'status' => 'gagal',
+                    'message' => 'Token Kadaluwarsa'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'Token Tidak Valid'
+            ]);
+        }
+    }
+
+
+    public function detailKelas(Request $request, $id) {
+        $validator = Validator::make($request ->all(), [
+            'token' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $validator->messages()
+            ]);
+        }
+
+        $token = $request->token;
+        $tokenDB = M_Pelajar::where('token', $token)->count();
+
+        if($tokenDB > 0) {
             $key = env('APP_KEY');
             $decoded = JWT::decode($token, $key, array('HS256'));
             $decoded_array =(array) $decoded;
