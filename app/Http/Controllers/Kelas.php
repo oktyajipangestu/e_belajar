@@ -296,4 +296,14 @@ class Kelas extends Controller
         }
     }
 
+    public function listKelas() {
+        $kelas = M_Kelas::get();
+
+        return response()->json([
+            'status' => 'berhasil',
+            'message' => 'data berhasil diambil',
+            'data' => $kelas
+        ]);
+    }
+
 }

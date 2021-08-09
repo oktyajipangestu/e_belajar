@@ -49,6 +49,7 @@ class VerifyCsrfToken extends Middleware
         '/quiz',
         '/jawab',
         '/hitungSkor',
-        '/selesaiUjian'
+        '/selesaiUjian',
+        '/listKelas'
     ];
 }

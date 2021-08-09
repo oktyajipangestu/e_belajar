@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\M_Jawaban;
 use App\M_Pelajar;
+use App\M_Pengajar;
 use App\M_Skor;
 use App\M_Soal;
 use Illuminate\Http\Request;
@@ -11,9 +12,114 @@ use \Firebase\JWT\JWT;
 
 class Ujian extends Controller
 {
+    public function tambahSoal(Request $request) {
+        $validator = Validator::make($request ->all(), [
+            'id_kelas' => 'required',
+            'pertanyaan' => 'required | unique:tbl_soal',
+            'opsi1' => 'required',
+            'opsi2' => 'required',
+            'opsi3' => 'required',
+            'opsi4' => 'required',
+            'jawaban' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $validator->messages()
+            ]);
+        }
+
+        $token = $request->token;
+        $tokenDB = M_Pengajar::where('token', $token)->count();
+
+        if($tokenDB > 0) {
+            $key = env('APP_KEY');
+
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            $decoded_array = (array) $decoded;
+
+            if($decoded_array['extime'] > time()) {
+                if(M_Soal::create([
+                    'id_kelas' => $request->id_kelas,
+                    'pertanyaan' => $request->pertanyaan,
+                    'opsi1' => $request->opsi1,
+                    'opsi2' => $request->opsi2,
+                    'opsi3' => $request->opsi3,
+                    'opsi4' => $request->opsi4,
+                    'jawaban' => $request->jawaban
+                ])) {
+                    return response()->json([
+                        'status' => 'berhasil',
+                        'message' => 'data berhasil disimpan'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'gagal',
+                        'message' => 'data gagal disimpan'
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'status' => 'gagal',
+                    'message' => 'token kadaluwarsa'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'token tidak valid'
+            ]);
+        }
+
+    }
+
+    public function hapusSoal(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id_soal' => 'required',
+            'token' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $validator->messages()
+            ]);
+        }
+
+        $token = $request->token;
+        $tokenDB = M_Pengajar::where('token', $token)->count();
+
+        if($tokenDB > 0) {
+            $key = env('APP_KEY');
+            $decoded = JWT::decode($token, $key, array('HS256'));
+            $decoded_array = (array) $decoded;
+
+            if($decoded_array['extime'] > time()) {
+                if(M_Soal::where('id_soal', $request->id_soal)->delete()){
+                    return response()->json([
+                        'status' => 'berhasil',
+                        'message' => 'data berhasil dihapus'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'gagal',
+                        'message' => 'data gagal dihapus'
+                    ]);
+                }
+            }
+        } else {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'token kadaluwarsa'
+            ]);
+        }
+    }
+
     public function listSoal(Request $request) {
         $token = $request->token;
         $tokenDB = M_Pelajar::where('token', $token)->count();
+        $tokenPengajar = M_Pengajar::where('token', $token)->count();
 
         if($tokenDB > 0) {
             $key = env('APP_KEY');
@@ -187,14 +293,16 @@ class Ujian extends Controller
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $id_s = M_Skor::where('id_peserta', $decoded_array['id_peserta'])->where('status', '1')->first();
+                $id_s = M_Skor::where('id_pelajar', $decoded_array['id_pelajar'])->where('id_kelas', $request->id_kelas)->where('status', '1')->first();
 
                 if(M_Skor::where('id_skor', $id_s->id_skor)->update([
                     'status' => 0
                 ])) {
                     return response()->json([
                         'status' => 'berhasil',
-                        'message' => 'Data berhasil diubah'
+                        'message' => 'Data berhasil diubah',
+                        'data' => $request->id_kelas
+
                     ]);
                 } else {
                     return response()->json([

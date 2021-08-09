@@ -28,6 +28,7 @@ Route::post('/editKelas', 'Kelas@editKelas');
 Route::post('/hapusKelas', 'Kelas@hapusKelas');
 Route::post('/listKelasPengajar', 'Kelas@listKelasPengajar');
 Route::post('/listKelasPelajar', 'Kelas@listKelasPelajar');
+Route::get('/listKelas', 'Kelas@listKelas');
 
 Route::post('/registrasiPelajar', 'Pelajar@registrasiPelajar');
 Route::post('/loginPelajar', 'Pelajar@loginPelajar');

@@ -47,7 +47,7 @@ class Progress extends Controller
                                 ]);
                             } else {
                                 return response()->json([
-                                    'status' => 'sukses',
+                                    'status' => 'gagal',
                                     'message' => 'progress gagal diperbaharui'
                                 ]);
                             }
@@ -64,7 +64,7 @@ class Progress extends Controller
                                 ]);
                             } else {
                                 return response()->json([
-                                    'status' => 'sukses',
+                                    'status' => 'gagal',
                                     'message' => 'progress gagal diperbaharui'
                                 ]);
                             }

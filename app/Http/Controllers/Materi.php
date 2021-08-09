@@ -87,7 +87,7 @@ class Materi extends Controller
         }
 
         $token = $request->token;
-        $tokenDB = M_Materi::where('token', $token)->count();
+        $tokenDB = M_Pengajar::where('token', $token)->count();
 
         if($tokenDB > 0) {
             $key = env('APP_KEY');
@@ -96,6 +96,7 @@ class Materi extends Controller
 
             if($decoded_array['extime'] > time()) {
                 if(M_Materi::where('id_materi', $request->id_materi)->update([
+                    'id_kelas' => $request->id_kelas,
                     'judul' => $request->judul,
                     'keterangan' => $request->keterangan,
                     'link_thumbnail' => $request->link_thumbnail,
@@ -149,10 +150,10 @@ class Materi extends Controller
 
             if($decoded_array['extime'] > time()) {
                 if(M_Materi::where('id_materi',$request->id_materi)->delete()) {
-                        return response()->json([
-                            'status' => 'berhasil',
-                            'message' => 'Data berhasil dihapus'
-                        ]);
+                    return response()->json([
+                        'status' => 'berhasil',
+                        'message' => 'Data berhasil dihapus'
+                    ]);
                 } else {
                     return response()->json([
                         'status' => 'gagal',
@@ -175,7 +176,7 @@ class Materi extends Controller
     }
 
     public function listMateriPengajar(Request $request) {
-        $validator = Validator::make($request ->all(), [
+        $validator = Validator::make($request->all(), [
             'token' => 'required',
             'id_kelas' => 'required'
         ]);
@@ -196,7 +197,7 @@ class Materi extends Controller
             $decoded_array =(array) $decoded;
 
             if($decoded_array['extime'] > time()) {
-                $materi = M_Materi::where('id_kelas', $request->id)->get();
+                $materi = M_Materi::where('id_kelas' , $request->id_kelas)->get();
 
                 return response()->json([
                     'status' => 'berhasil',
